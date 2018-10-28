@@ -1,11 +1,6 @@
-
 import java.util.LinkedList;
 import java.util.Queue;
 
-/**
- *
- * @author HP14
- */
 public class ArbolBinBusqueda {
     
     Nodo root;
@@ -44,8 +39,7 @@ public class ArbolBinBusqueda {
         }
     
     }
-    
-    
+       
     public boolean busqueda(int valor){
      return(busqueda1(valor,this.root));
     }    
@@ -86,26 +80,23 @@ public class ArbolBinBusqueda {
         }   
         return null;
     }
-   public void add(Nodo n){
+    public void add(Nodo n){
         Nodo p=this.root;
-        int cont=0;
         if(!busqueda(n.valor)){           
         do{           
         if(n.valor<p.valor ){
-            cont++;
             if( p.izq==null){
                 p.izq=n;
                 n.padre=p;
-                n.altura=cont;
+                balanceo1(n);
             }else{
                 p=p.izq;
             }
         }else if(n.valor>p.valor){
-            cont++;
             if(p.der==null){
             p.der=n;
             n.padre=p;
-            n.altura=cont;
+            balanceo1(n);
             }else{
                 p=p.der;
             }        
@@ -113,8 +104,7 @@ public class ArbolBinBusqueda {
         }while(n.padre==null);            
         }
     }
-    
- 
+
     public void preorden(){
         System.out.println("Notación prefija ");
         preorden1(this.root);
@@ -216,8 +206,7 @@ public class ArbolBinBusqueda {
         }
         return 0;
     }    
-    
-
+   
 public int altura() {       
         altura1(this.root, 0);
         return altura;
@@ -235,11 +224,13 @@ public void altura1(Nodo raiz, int nivel) {
     }
 
 public int alturaSub(Nodo raiz) {
-        int al=raiz.altura;
-        
-        al=altura2(raiz, 0, al);
-        
+    if(raiz!=null){
+        int al=raiz.altura;        
+        al=altura2(raiz, 0, al);       
         return al;
+    }else{
+    return -1;
+    }
     }
 
 public int altura2(Nodo raiz, int nivel,int al) {
@@ -252,8 +243,6 @@ public int altura2(Nodo raiz, int nivel,int al) {
         }
         return al;
     }
-
-
 
 public boolean esBalanceado(){
     int altIz;
@@ -328,7 +317,6 @@ public void borrar(Nodo raiz){
     }
 }
 
- 
 public void eliminar1(Nodo n){
         if(n.padre!=null){
         Nodo iz=n.padre.izq;
@@ -398,7 +386,6 @@ public void eliminar2(Nodo n){
         
     }
 
-
 public void eliminar3(Nodo n){
     Nodo suc=sucesor(n);
     borrar(suc);
@@ -415,12 +402,16 @@ public void eliminar(int valor){
             //Si no tiene hijos
             if(n.izq==null&& n.der==null){
                 eliminar1(n);
+                balanceo1(n);
             }else if (n.izq!=null&& n.der==null){   //si tiene un hijo
                 eliminar2(n);
+                 balanceo1(n);
             }else if (n.izq==null&& n.der!=null){
                 eliminar2(n);
+                 balanceo1(n);
             }else if(n.izq!=null&& n.der!=null){ //si tiene dos hijos
                 eliminar3(n);
+                 balanceo1(n);
             
             }
             
@@ -431,10 +422,159 @@ public void eliminar(int valor){
         }
    
     }
+ 
+public void calcularFactor(Nodo n){
+    int altIz;
+    int altDer;
+    int dif;
+    
+   
+    altIz=alturaSub(n.izq);    
+    altDer=alturaSub(n.der);
+    dif = altDer-altIz;
+    n.indice=dif;
+    
+}
 
-}    
+public void estableceFactor(){
+    Nodo r=root;
+        Queue<Nodo> queue = new LinkedList();
+        if(r!=null){
+            queue.add(r);
+            while(!queue.isEmpty()){
+                r=(Nodo)queue.poll();
+                calcularFactor(r);
+                if(r.izq!=null) 
+                    queue.add(r.izq);
+                if(r.der!=null)
+                    queue.add(r.der);
+            
+            }
+        
+        }
+    
+}
+public void rotacionSimpleIzq(Nodo n){
+    Nodo a=new Nodo();
+    a=n;
+    //cambio de riz
+    if(n==root){
+        root=root.der;
+        a.der=root.izq;
+        root.izq=a;
+        a.padre=root;
+        if(a.izq!=null)
+            a.der.padre=a;
+        root.padre=null;
+    }else{
+        n=n.der;
+        a.der=n.izq;
+        n.izq=a;
+        n.padre=a.padre;
+        if(a==a.padre.izq){
+            a.padre.izq=n;
+        }else{
+            a.padre.der=n;
+        }
+        a.padre=n;
+        if(a.izq!=null)
+            a.der.padre=a;
+        
+    }
+    
+    
+}
+public void rotacionSimpleDer(Nodo n){
+    Nodo a=new Nodo();
+    a=n;
+    if(n==root){
+        root=root.izq;
+        a.izq=root.der;   
+        root.der=a;
+        a.padre=root;
+        if(a.izq!=null)
+            a.izq.padre=a;
+        root.padre=null;
+    }else{
+        n=n.izq;
+        a.izq=n.der;   
+        n.der=a;
+        n.padre=a.padre;
+    if(a==a.padre.izq){
+        a.padre.izq=n;
+    }else{
+        a.padre.der=n;
+    }
+   
+    a.padre=n;
+    if(a.izq!=null)
+        a.izq.padre=a;
+    
+    }
+    
+    
+    
+}
+public void rotacionDobleIzq(Nodo n){
+    rotacionSimpleDer(n.der);
+    rotacionSimpleIzq(n);
+   
+}
+public void rotacionDobleDer(Nodo n){
+    rotacionSimpleIzq(n.izq);
+    rotacionSimpleDer(n);
+}
+public void balanceo2(Nodo n){
+    
+    System.out.println("valanceo ");    
+    if(n.indice>1){
+        if(n.der!=null){
+            if(n.der.indice >=0){
+                System.out.println("valanceo simple izq");
+                rotacionSimpleIzq(n);
+            }else{
+                System.out.println("valanceo doble izq");
+                rotacionDobleIzq(n);
+            }
+        }
         
         
+    }else if(n.indice<-1){
+         if(n.der!=null){
+             if(n.izq.indice <=0 ){
+                 System.out.println("valanceo simple Der");
+                rotacionSimpleDer(n);
+             }else{
+                  System.out.println("valanceo doble der");
+                  rotacionDobleDer(n);
+             }
+         }
+    }
+  
+    
+}
+public void balanceo1(Nodo n){
+    estableceFactor();
+    Nodo r=n;
+        Queue<Nodo> queue = new LinkedList();
+        if(r!=null){
+            queue.add(r);
+            while(!queue.isEmpty()){
+                r=(Nodo)queue.poll();
+                if(r.indice<-1 || r.indice>1)
+                    balanceo2(r);
+                if(r.padre!=null) 
+                    queue.add(r.padre);           
+            }
+        
+        }
+    
+    
+}
+
+}
+
+
         
         
     

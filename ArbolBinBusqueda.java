@@ -86,21 +86,26 @@ public class ArbolBinBusqueda {
         }   
         return null;
     }
-    public void add(Nodo n){
+   public void add(Nodo n){
         Nodo p=this.root;
+        int cont=0;
         if(!busqueda(n.valor)){           
         do{           
         if(n.valor<p.valor ){
+            cont++;
             if( p.izq==null){
                 p.izq=n;
-                n.padre=p; 
+                n.padre=p;
+                n.altura=cont;
             }else{
                 p=p.izq;
             }
         }else if(n.valor>p.valor){
+            cont++;
             if(p.der==null){
             p.der=n;
             n.padre=p;
+            n.altura=cont;
             }else{
                 p=p.der;
             }        

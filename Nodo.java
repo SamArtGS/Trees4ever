@@ -8,6 +8,7 @@ public class Nodo {
 	Nodo der=null;
         Nodo padre=null;
         int altura;
+	int indice;
         
 	public Nodo(){
 		izq=der=padre=null;
